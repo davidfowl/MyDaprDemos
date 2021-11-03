@@ -11,14 +11,9 @@ variable "region" {
   default     = "us-east-2"
 }
 
-variable "table_name" {
-  description = "Dynamodb table name (space is not allowed)"
-  default     = "dapr_store"
-}
-
-variable "table_billing_mode" {
-  description = "Controls how you are charged for read and write throughput and how you manage capacity."
-  default     = "PAY_PER_REQUEST"
+variable "secret_name" {
+  description = "Secret name (space is not allowed)"
+  default     = "dapr-secret"
 }
 
 variable "environment" {

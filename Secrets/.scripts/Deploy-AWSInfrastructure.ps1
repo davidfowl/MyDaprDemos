@@ -13,14 +13,16 @@ function Deploy-AWSInfrastructure {
         "access_key = `"$env:AWS_ACCESS_KEY_ID`" `nsecret_key = `"$env:AWS_SECRET_ACCESS_KEY`"" | Set-Content ./terraform.tfvars
 
         $sw = [Diagnostics.Stopwatch]::StartNew()
+        
         if ($(Test-Path ./.terraform) -eq $false) {
             terraform init
         }
 
         terraform apply -auto-approve
+
         $sw.Stop()
 
-        Write-Verbose "Total elapsed time: $($sw.Elapsed.Minutes):$($sw.Elapsed.Seconds):$($sw.Elapsed.Milliseconds) for deploying a AWS DynamoDB"
+        Write-Verbose "Total elapsed time: $($sw.Elapsed.Minutes):$($sw.Elapsed.Seconds):$($sw.Elapsed.Milliseconds) for deploying aws_secretsmanager_secret"
     }
 
     end {

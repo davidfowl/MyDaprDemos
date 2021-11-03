@@ -21,7 +21,7 @@ param (
     [Parameter(
         HelpMessage = "Set to the location of the resources to use."
     )]
-    [ValidateSet("local", "azure")]
+    [ValidateSet("local", "azure", "aws", "gcp")]
     [string]
     $env = "local",
 
@@ -38,13 +38,26 @@ param (
     $skipDaprRun
 )
 
+. "./.scripts/Deploy-AWSInfrastructure.ps1"
+. "./.scripts/Deploy-GCPInfrastructure.ps1"
 . "./.scripts/Deploy-AzureInfrastructure.ps1"
 
 # This will deploy the infrastructure without running the demo. You can use
 # this flag to set everything up before you run the demos to save time. Some
 # infrastucture can take some time to deploy.
 if ($deployOnly.IsPresent) {
-    Deploy-AzureInfrastructure -rgName $rgName -location $location
+    if ($env -eq 'local' -or $env -eq 'aws') {
+        Deploy-AWSInfrastructure
+    }
+
+    if ($env -eq 'local' -or $env -eq 'gcp') {
+        Deploy-GCPInfrastructure
+    }
+
+    if ($env -eq 'local' -or $env -eq 'azure') {
+        Deploy-AzureInfrastructure -rgName $rgName -location $location
+    }
+    
     return
 }
 
@@ -52,8 +65,6 @@ if ($deployOnly.IsPresent) {
 code ./sampleRequests.http
 
 if ($env -eq "azure") {
-    Write-Output "Running demo with cloud resources"
-
     # If you don't find the ./components/azure/local_secrets.json run the setup.ps1 in deploy folder
     $fileMissing = $(Test-Path -Path './components/azure/local_secrets.json') -eq $false
 
@@ -61,7 +72,7 @@ if ($env -eq "azure") {
     # the IP address in there matches our current IP. If not we need to deploy
     # again to update the firewall rules.
     $myIp = $(Invoke-WebRequest https://ifconfig.me/ip).Content
-    
+
     if ($fileMissing -or
         $myIp -ne $(Get-Content -Path './components/azure/local_secrets.json' | ConvertFrom-Json).ipAddress
     ) {
@@ -74,19 +85,25 @@ if ($env -eq "azure") {
         
         Deploy-AzureInfrastructure -rgName $rgName -location $location
     }
-
-    if ($skipDaprRun.IsPresent -eq $false) {
-        Write-Output "dapr run --app-id app1 --app-port 5013 --dapr-http-port 3500 --components-path ./components/azure -- dotnet run --project ./src/ `n"
-
-        dapr run --app-id app1 --app-port 5013 --dapr-http-port 3500 --components-path ./components/azure -- dotnet run --project ./src/
+}
+elseif ($env -eq "aws") {
+    # If you don't find the ./deploy/aws/terraform.tfvars run the setup.ps1 in deploy folder
+    if ($(Test-Path -Path './deploy/aws/terraform.tfvars') -eq $false) {
+        Write-Output "Could not find ./deploy/aws/terraform.tfvars"
+        Deploy-AWSInfrastructure
     }
 }
-else {
-    Write-Output "Running demo with local resources"
-
-    if ($skipDaprRun.IsPresent -eq $false) {
-        Write-Output "dapr run --app-id app1 --app-port 5013 --dapr-http-port 3500 --components-path ./components/local -- dotnet run --project ./src/ `n"
-
-        dapr run --app-id app1 --app-port 5013 --dapr-http-port 3500 --components-path ./components/local -- dotnet run --project ./src/
+elseif ($env -eq "gcp") {
+    # If you don't find the ./deploy/gcp/terraform.tfvars run the setup.ps1 in deploy folder
+    if ($(Test-Path -Path './deploy/gcp/terraform.tfvars') -eq $false) {
+        Write-Output "Could not find ./deploy/gcp/terraform.tfvars"
+        Deploy-GCPInfrastructure
     }
+}
+
+if ($skipDaprRun.IsPresent -eq $false) {
+    Write-Output "Running demo with $env resources"
+    Write-Output "dapr run --app-id app1 --app-port 5013 --dapr-http-port 3500 --components-path ./components/$env -- dotnet run --project ./src/ `n"
+
+    dapr run --app-id app1 --app-port 5013 --dapr-http-port 3500 --components-path ./components/$env -- dotnet run --project ./src/
 }
