@@ -10,7 +10,7 @@ param (
     $rgName = "dapr_pubsub_demo",
 
     [Parameter(
-        HelpMessage = "Set to the location of the resources to use."
+        HelpMessage = "Set to the environment of the resources to clean up."
     )]
     [ValidateSet("all", "azure", "aws", "gcp")]
     [string]
