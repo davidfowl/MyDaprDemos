@@ -168,10 +168,10 @@ jobs:
             --set provider.provider.image='${{ secrets.DOCKERHUB_USERNAME }}/csharpprovider' `
             --set processor.processor.image='${{ secrets.DOCKERHUB_USERNAME }}/csharpprocessor' `
             --set components.zipkin.externalPort='80' `
-            --set components.twitter.consumerKey='${{ secrets.TWITTER_CONSUMERKEY }}' `
-            --set components.twitter.accessToken='${{ secrets.TWITTER_ACCESSTOKEN }}' `
-            --set components.twitter.accessSecret='${{ secrets.TWITTER_ACCESSSECRET }}' `
-            --set components.twitter.consumerSecret='${{ secrets.TWITTER_CONSUMERSECRET }}' `
+            --set components.twitter.consumerKey='${{ secrets.TWITTER_API_KEY }}' `
+            --set components.twitter.accessToken='${{ secrets.TWITTER_ACCESS_TOKEN }}' `
+            --set components.twitter.consumerSecret='${{ secrets.TWITTER_API_KEY_SECRET }}' `
+            --set components.twitter.accessSecret='${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}' `
             --set components.tableStorage.key='${{ needs.deployInfrastructure.outputs.storageAccountKey }}' `
             --set components.tableStorage.name='${{ needs.deployInfrastructure.outputs.storageAccountName }}' `
             --set components.cognitiveService.token='${{ needs.deployInfrastructure.outputs.cognitiveServiceKey }}' `

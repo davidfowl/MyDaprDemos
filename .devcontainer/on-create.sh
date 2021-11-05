@@ -31,6 +31,6 @@ az config set core.output=table
 aws configure set output table
 
 # install PowerShell modules
-pwsh -Command "& {Install-Module -Name Trackyon.Utils, VSTeam, powershell-yaml -Force}"
+pwsh -Command "& {Install-Module -Name Trackyon.Utils, VSTeam, powershell-yaml, PSSodium -Force}"
  
 echo "on-create complete" >> ~/status

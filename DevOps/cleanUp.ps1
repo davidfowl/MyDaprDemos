@@ -13,11 +13,15 @@ param (
     $force
 )
 
+. "./.scripts/GitHubActions.ps1"
+
 # Remove local_secrets.json
 Remove-Item ./charts/local.yaml -Force -ErrorAction SilentlyContinue
 Remove-Item ./charts/charts/ -Recurse -Force -ErrorAction SilentlyContinue
 Remove-Item ./components/local/local.env -Force -ErrorAction SilentlyContinue
 Remove-Item ./components/local/local_secrets.json -Force -ErrorAction SilentlyContinue
+
+Get-GitHubActionsSecret | Remove-GitHubActionsSecret
 
 if ($force.IsPresent) {
     az group delete --resource-group $rgName --yes

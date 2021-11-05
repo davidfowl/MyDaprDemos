@@ -21,7 +21,7 @@ param (
     [Parameter(
         HelpMessage = "Set to the location of the resources to use."
     )]
-    [ValidateSet("local", "k8s")]
+    [ValidateSet("local", "k8s", "azure")]
     [string]
     $env = "local",
 
@@ -32,6 +32,7 @@ param (
     $deployOnly
 )
 
+. "./.scripts/GitHubActions.ps1"
 . "./.scripts/Deploy-AzureInfrastructure.ps1"
 
 # This will deploy the infrastructure without running the demo. You can use
@@ -42,14 +43,14 @@ if ($deployOnly.IsPresent) {
     return
 }
 
-# If you don't find the ./components/local/local_secrets.json run the setup.ps1 in deploy folder
-if ($(Test-Path -Path './components/local/local_secrets.json') -eq $false) {
-    Write-Output "Could not find ./components/local/local_secrets.json"
-    
-    Deploy-AzureInfrastructure -rgName $rgName -location $location
-}
-
 if ($env -eq "local") {
+    # If you don't find the ./components/local/local_secrets.json run the setup.ps1 in deploy folder
+    if ($(Test-Path -Path './components/local/local_secrets.json') -eq $false) {
+        Write-Output "Could not find ./components/local/local_secrets.json"
+    
+        Deploy-AzureInfrastructure -rgName $rgName -location $location
+    }
+
     Write-Output "Running demo with local resources"
 
     # Make sure the dapr_zipkin container is running.
@@ -61,7 +62,31 @@ if ($env -eq "local") {
 
     tye run ./src/tye_local.yaml
 }
+elseif ($env -eq "azure") {    
+    $azureSecrets = @{
+        'name' = $env:AZURE_APP_ID
+        'appId' = $env:AZURE_APP_ID
+        'tenant' = $env:AZURE_TENANT
+        'password' = $env:AZURE_PASSWORD
+    }
+    
+    $asJson = $azureSecrets | ConvertTo-Json
+    
+    Set-GitHubActionsSecret -Name 'AZURE_CREDENTIALS' -Value $asJson
+    Get-ChildItem env: | Where-Object { $_.name -like "TWITTER_*" -OR $_.name -like "DOCKERHUB_*" } | Set-GitHubActionsSecret
+
+    $workflow = Get-GitHubActionsWorkflow -name demo_devops.yml
+    
+    Start-GitHubActionsWorkflow -workflow_id $workflow.id
+}
 else {
+    # If you don't find the ./components/local/local_secrets.json run the setup.ps1 in deploy folder
+    if ($(Test-Path -Path './components/local/local_secrets.json') -eq $false) {
+        Write-Output "Could not find ./components/local/local_secrets.json"
+    
+        Deploy-AzureInfrastructure -rgName $rgName -location $location
+    }
+
     if ($null -eq $(docker images "k3d-registry.localhost:5500/*" -q)) {
         # Build all the images
         docker build -f ./src/viewer/Dockerfile -t k3d-registry.localhost:5500/csharpviewer:local ./src/viewer/
