@@ -64,10 +64,10 @@ if ($env -eq "local") {
 }
 elseif ($env -eq "azure") {    
     $azureSecrets = @{
-        'name' = $env:AZURE_APP_ID
-        'appId' = $env:AZURE_APP_ID
-        'tenant' = $env:AZURE_TENANT
-        'password' = $env:AZURE_PASSWORD
+        'subscriptionId' = $env:AZURE_SUB_ID
+        'clientId' = $env:AZURE_APP_ID
+        'tenantId' = $env:AZURE_TENANT
+        'clientSecret' = $env:AZURE_PASSWORD
     }
     
     $asJson = $azureSecrets | ConvertTo-Json
@@ -75,7 +75,7 @@ elseif ($env -eq "azure") {
     Set-GitHubActionsSecret -Name 'AZURE_CREDENTIALS' -Value $asJson
     Get-ChildItem env: | Where-Object { $_.name -like "TWITTER_*" -OR $_.name -like "DOCKERHUB_*" } | Set-GitHubActionsSecret
 
-    $workflow = Get-GitHubActionsWorkflow -name demo_devops.yml
+    $workflow = Get-GitHubActionsWorkflow -name azure_demo_devops.yml
     
     Start-GitHubActionsWorkflow -workflow_id $workflow.id
 }
