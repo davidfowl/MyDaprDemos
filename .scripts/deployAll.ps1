@@ -1,14 +1,14 @@
 # This will call setup of every demo.
 
 [CmdletBinding()]
-param ()
+param (
+    $demo = @('Binding', 'Observability', 'PubSub', 'StateStore', 'Secrets', 'DevOps')
+)
 
-$demos = @('Binding', 'Observability', 'PubSub', 'StateStore', 'Secrets', 'DevOps')
+foreach ($d in $demo) {
+    Write-Host "Setting up $d"
 
-foreach ($demo in $demos) {
-    Write-Host "Setting up $demo"
-    
-    Push-Location "../$demo"
+    Push-Location "../$d"
     ./demo.ps1 -deployOnly
-    Pop-Location   
+    Pop-Location
 }

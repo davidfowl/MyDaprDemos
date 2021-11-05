@@ -2,16 +2,16 @@
 
 [CmdletBinding()]
 param (
+    $demo = @('Binding', 'Observability', 'PubSub', 'StateStore', 'Secrets', 'DevOps'),
+
     [switch]
     $Force
 )
 
-$demos = @('Binding', 'Observability', 'PubSub', 'StateStore', 'Secrets', 'DevOps')
+foreach ($d in $demo) {
+    Write-Host "Cleaning up $d"
 
-foreach ($demo in $demos) {
-    Write-Host "Cleaning up $demo"
-    
-    Push-Location "../$demo"
+    Push-Location "../$d"
     ./cleanUp.ps1 -force:$Force.IsPresent
-    Pop-Location   
+    Pop-Location
 }

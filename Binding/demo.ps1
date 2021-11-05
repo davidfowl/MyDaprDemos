@@ -1,6 +1,6 @@
 # This script issues and displays the correct dapr run command for running with
 # local or cloud resources. To run in the clould add the -env azure parameter.
-# If the script determines the infrastructure has not been deployed it will 
+# If the script determines the infrastructure has not been deployed it will
 # call the setup script first.
 [CmdletBinding()]
 param (
@@ -41,9 +41,15 @@ param (
 # This will deploy the infrastructure without running the demo. You can use
 # this flag to set everything up before you run the demos to save time. Some
 # infrastucture can take some time to deploy.
-if ($deployOnly.IsPresent) {    
-    Deploy-AWSInfrastructure
-    Deploy-AzureInfrastructure -rgName $rgName -location $location    
+if ($deployOnly.IsPresent) {
+    if ($env -eq 'local' -or $env -eq 'aws') {
+        Deploy-AWSInfrastructure
+    }
+    
+    if ($env -eq 'local' -or $env -eq 'azure') {
+        Deploy-AzureInfrastructure -rgName $rgName -location $location
+    }
+    
     return
 }
 
@@ -73,7 +79,7 @@ Set-Content -Path ./sampleRequests.http -Value $file
 # Load the sample requests file for the demo
 code ./sampleRequests.http
 
-if ($env -eq "azure") {    
+if ($env -eq "azure") {
     # If you don't find the ./components/azure/local_secrets.json run the setup.ps1 in deploy folder
     if ($(Test-Path -Path './components/azure/local_secrets.json') -eq $false) {
         Write-Output "Could not find ./components/azure/local_secrets.json"

@@ -23,10 +23,10 @@ param (
     $timing
 )
 
-# Remove local_secrets.json
-Remove-Item ./components/azure/local_secrets.json -ErrorAction SilentlyContinue
-
 if ($env -eq 'all' -or $env -eq 'azure') {
+    # Remove local_secrets.json
+    Remove-Item ./components/azure/local_secrets.json -ErrorAction SilentlyContinue
+
     if ($timing.IsPresent) {
         $sw = [Diagnostics.Stopwatch]::StartNew()
 
@@ -41,7 +41,7 @@ if ($env -eq 'all' -or $env -eq 'azure') {
 
         Write-Verbose "Total elapsed time: $($sw.Elapsed.Minutes):$($sw.Elapsed.Seconds):$($sw.Elapsed.Milliseconds) for deleting a Azure Event Hubs, Service Bus & SQL Server"
     }
-    else {    
+    else {
         if ($force.IsPresent) {
             az group delete --resource-group $rgName --no-wait --yes
         }
@@ -51,7 +51,6 @@ if ($env -eq 'all' -or $env -eq 'azure') {
     }
 }
 
-### AWS
 if ($env -eq 'all' -or $env -eq 'aws') {
     # Delete AWS resources
     if ($(Test-Path ./deploy/aws/terraform.tfvars)) {
@@ -72,7 +71,6 @@ if ($env -eq 'all' -or $env -eq 'aws') {
     Remove-Item ./deploy/aws/terraform.tfstate.backup -Force -ErrorAction SilentlyContinue
 }
 
-### GCP
 if ($env -eq 'all' -or $env -eq 'gcp') {
     # Delete GCP resources
     if ($(Test-Path ./deploy/gcp/terraform.tfvars)) {

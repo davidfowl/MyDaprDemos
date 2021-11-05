@@ -9,16 +9,25 @@ param (
     [string]
     $rgName = "dapr_observability_demo",
 
+    [Parameter(
+        HelpMessage = "Set to the environment of the resources to clean up."
+    )]
+    [ValidateSet("all", "azure")]
+    [string]
+    $env = "all",
+
     [switch]
     $force
 )
 
-# Put the otel-local-config.yaml file back the way it was
-git restore ./config/azure/otel-local-config.yaml
+if ($env -eq 'all' -or $env -eq 'azure') {
+    # Put the otel-local-config.yaml file back the way it was
+    git restore ./config/azure/otel-local-config.yaml
 
-if ($force.IsPresent) {
-    az group delete --resource-group $rgName --no-wait --yes
-}
-else {
-    az group delete --resource-group $rgName --no-wait
+    if ($force.IsPresent) {
+        az group delete --resource-group $rgName --no-wait --yes
+    }
+    else {
+        az group delete --resource-group $rgName --no-wait
+    }
 }

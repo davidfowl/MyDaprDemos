@@ -49,7 +49,7 @@ if ($env -eq 'all' -or $env -eq 'azure') {
 
         Write-Verbose "Total elapsed time: $($sw.Elapsed.Minutes):$($sw.Elapsed.Seconds):$($sw.Elapsed.Milliseconds) for deleting a Azure Blob Storage"
     }
-    else {    
+    else {
         if ($force.IsPresent) {
             az group delete --resource-group $rgName --no-wait --yes
         }
@@ -59,7 +59,6 @@ if ($env -eq 'all' -or $env -eq 'azure') {
     }
 }
 
-### AWS
 if ($env -eq 'all' -or $env -eq 'aws') {
     # Delete AWS resources
     if ($(Test-Path ./deploy/aws/terraform.tfvars)) {

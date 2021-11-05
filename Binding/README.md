@@ -6,8 +6,19 @@ Open the _demo_binding.code-workspace_ file and click the **Open Workspace** but
 
 To provision the infrastructure before the demo execute the following command in the terminal. 
 
+Provision all environments
+```
+./demo.ps1 -deployOnly
+```
+
+Provision Azure only
 ```
 ./demo.ps1 -env azure -deployOnly
+```
+
+Provision AWS only
+```
+./demo.ps1 -env aws -deployOnly
 ```
 
 This code is automatically run by the _demo.ps1_ script if the `-env azure` parameter is passed and *./components/azure/local_secrets.json* file is not found.
@@ -21,9 +32,14 @@ Running local
 ./demo.ps1
 ```
 
-Running in cloud
+Running in Azure
 ```
 ./demo.ps1 -env azure
+```
+
+Running in AWS
+```
+./demo.ps1 -env aws
 ```
 
 Click the Send Request button above each of the requests to execute them.

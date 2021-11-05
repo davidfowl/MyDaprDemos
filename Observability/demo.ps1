@@ -17,7 +17,7 @@ param (
     )]
     [string]
     $location = "eastus",
-    
+
     [Parameter(
         HelpMessage = "Set to the location of the resources to use."
     )]
@@ -38,7 +38,10 @@ param (
 # this flag to set everything up before you run the demos to save time. Some
 # infrastucture can take some time to deploy.
 if ($deployOnly.IsPresent) {
-    Deploy-AzureInfrastructure -rgName $rgName -location $location
+    if ($env -eq 'local' -or $env -eq 'azure') {
+        Deploy-AzureInfrastructure -rgName $rgName -location $location
+    }
+
     return
 }
 
