@@ -27,11 +27,15 @@ param (
 git restore ./sampleRequests.http
 
 if ($env -eq 'all' -or $env -eq 'local') {
+    Write-Host "Cleaning up local"
+
     # Remove the myTestFile.txt
     Remove-Item ./tempfiles/myTestFile.txt -ErrorAction SilentlyContinue
 }
 
 if ($env -eq 'all' -or $env -eq 'azure') {
+    Write-Host "Cleaning up azure"
+
     # Remove local_secrets.json
     Remove-Item ./components/azure/local_secrets.json -ErrorAction SilentlyContinue
 
@@ -60,6 +64,8 @@ if ($env -eq 'all' -or $env -eq 'azure') {
 }
 
 if ($env -eq 'all' -or $env -eq 'aws') {
+    Write-Host "Cleaning up aws"
+
     # Delete AWS resources
     if ($(Test-Path ./deploy/aws/terraform.tfvars)) {
         Push-Location ./deploy/aws
