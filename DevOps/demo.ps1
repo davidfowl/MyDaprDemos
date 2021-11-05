@@ -77,7 +77,9 @@ elseif ($env -eq "azure") {
 
     $workflow = Get-GitHubActionsWorkflow -name azure_demo_devops.yml
     
-    Start-GitHubActionsWorkflow -workflow_id $workflow.id
+    $branch = $(git branch --show-current).Trim()
+
+    Start-GitHubActionsWorkflow -workflow_id $workflow.id -branch $branch
 }
 else {
     # If you don't find the ./components/local/local_secrets.json run the setup.ps1 in deploy folder

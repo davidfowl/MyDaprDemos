@@ -10,7 +10,7 @@ function Remove-GitHubActionsSecret {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName)]
-        $Name
+        [string] $Name
     )
 
     process {
@@ -24,9 +24,9 @@ function Set-GitHubActionsSecret {
     [CmdletBinding()]
     param (
         [Parameter(ValueFromPipelineByPropertyName)]
-        $Name,
+        [string] $Name,
         [Parameter(ValueFromPipelineByPropertyName)]
-        $Value
+        [string] $Value
     )
 
     process {
@@ -57,7 +57,7 @@ function Get-GitHubRepositoryPublicKey {
 
 function Get-GitHubActionsWorkflow {
     param (
-        $name = $null
+        [string] $name = $null
     )
 
     if ($null -ne $name) {
@@ -72,11 +72,15 @@ function Get-GitHubActionsWorkflow {
 
 function Start-GitHubActionsWorkflow {
     param (
-        $workflow_id
+        [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName)]
+        [string] $workflow_id,
+        
+        [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName)]
+        [string] $branch
     )
 
     Invoke-RestMethod -Uri "https://api.github.com/repos/$($env:GITHUB_USER)/$($env:RepositoryName)/actions/workflows/$workflow_id/dispatches" `
         -Headers @{"Authorization" = "token $($env:ACTIONS_TOKEN)" } `
         -Method Post `
-        -Body '{"ref":"main"}'
+        -Body '{"ref":"$branch"}'
 }
