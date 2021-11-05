@@ -80,7 +80,25 @@ You can follow the instructions from the Twitter Developer Platform document [Ge
 
 Learn how to set Codespace secrets on the [Managing encrypted secrets for your codespaces](https://docs.github.com/en/codespaces/managing-your-codespaces/managing-encrypted-secrets-for-your-codespaces) page. Make sure you assign them permission to the fork of this repository.
 
-![codespace secrets](./.images/CodespaceSecrets.png)
+Name | Demo | Purpose 
+--- | --- | ---
+ACTIONS_TOKEN | DevOps  | Create secrets for GitHub Actions Workflow
+AWS_ACCESS_KEY_ID | Binding, StateStore, Secrets, PubSub  | For use with AWS demos
+AWS_DEFAULT_REGION | Binding, StateStore, Secrets, PubSub | For use with AWS demos
+AWS_SECRET_ACCESS_KEY | Binding, StateStore, Secrets, PubSub | For use with AWS demos
+AZURE_APP_ID | Binding, StateStore, Secrets, PubSub, Observability | For use with Azure demos
+AZURE_PASSWORD | Binding, StateStore, Secrets, PubSub, Observability | For use with Azure demos
+AZURE_TENANT | Binding, StateStore, Secrets, PubSub, Observability | For use with Azure demos
+DOCKER_HUB_TOKEN | DevOps | For to push docker images to Docker Hub
+DOCKER_HUB_USERNAME | DevOps | For to push docker images to Docker Hub
+GCP_DEFAULT_PROJECT | PubSub | For use with GCP demos
+GCP_DEFAULT_REGION | PubSub | For use with GCP demos
+GCP_KEY | PubSub | For use with GCP demos
+TWITTER_ACCESS_TOKEN | DevOps  | For use with DevOps demos
+TWITTER_ACCESS_TOKEN_SECRET | DevOps  | For use with DevOps demos
+TWITTER_API_KEY | DevOps  | For use with DevOps demos
+TWITTER_API_KEY_SECRET | DevOps | For use with DevOps demos
+
 
 ## Running Demos
 

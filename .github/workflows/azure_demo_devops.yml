@@ -38,15 +38,15 @@ jobs:
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
 
       - name: Build and push
         id: docker_build
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/csharp${{ matrix.app }}:${{ github.run_number }}
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/csharp${{ matrix.app }}:${{ github.run_number }}
           context: ./DevOps/src/${{ matrix.app }}/
 
       - name: Output matrix values
@@ -54,7 +54,7 @@ jobs:
         id: values
         run: |
           # Get all the outputs
-          Write-Output "::set-output name=image::${{ secrets.DOCKERHUB_USERNAME }}/csharp${{ matrix.app }}"
+          Write-Output "::set-output name=image::${{ secrets.DOCKER_HUB_USERNAME }}/csharp${{ matrix.app }}"
 
   deployInfrastructure:
     name: deploy infrastructure
@@ -164,9 +164,9 @@ jobs:
             --set provider.image.tag='${{ github.run_number }}' `
             --set processor.image.tag='${{ github.run_number }}' `
             --set viewer.viewer.externalPort='80' `
-            --set viewer.viewer.image='${{ secrets.DOCKERHUB_USERNAME }}/csharpviewer' `
-            --set provider.provider.image='${{ secrets.DOCKERHUB_USERNAME }}/csharpprovider' `
-            --set processor.processor.image='${{ secrets.DOCKERHUB_USERNAME }}/csharpprocessor' `
+            --set viewer.viewer.image='${{ secrets.DOCKER_HUB_USERNAME }}/csharpviewer' `
+            --set provider.provider.image='${{ secrets.DOCKER_HUB_USERNAME }}/csharpprovider' `
+            --set processor.processor.image='${{ secrets.DOCKER_HUB_USERNAME }}/csharpprocessor' `
             --set components.zipkin.externalPort='80' `
             --set components.twitter.consumerKey='${{ secrets.TWITTER_API_KEY }}' `
             --set components.twitter.accessToken='${{ secrets.TWITTER_ACCESS_TOKEN }}' `

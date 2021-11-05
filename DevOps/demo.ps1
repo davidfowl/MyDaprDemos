@@ -73,7 +73,7 @@ elseif ($env -eq "azure") {
     $asJson = $azureSecrets | ConvertTo-Json
     
     Set-GitHubActionsSecret -Name 'AZURE_CREDENTIALS' -Value $asJson
-    Get-ChildItem env: | Where-Object { $_.name -like "TWITTER_*" -OR $_.name -like "DOCKERHUB_*" } | Set-GitHubActionsSecret
+    Get-ChildItem env: | Where-Object { $_.name -like "TWITTER_*" -OR $_.name -like "DOCKER_HUB_*" } | Set-GitHubActionsSecret
 
     $workflow = Get-GitHubActionsWorkflow -name azure_demo_devops.yml
     
