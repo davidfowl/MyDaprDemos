@@ -10,6 +10,10 @@ export PATH=$PATH:$HOME/dotnet
 
 wget -q https://aka.ms/install-dotnet-preview -O - | /bin/bash -s - --install-dir $DOTNET_ROOT
 
+# Install Tye
+dotnet tool install -g Microsoft.Tye --version "0.10.0-alpha.21420.1"
+dotnet tool install -g Microsoft.Web.LibraryManager.Cli
+
 # Install Dapr CLI
 wget -q https://raw.githubusercontent.com/dapr/cli/master/install/install.sh -O - | /bin/bash
 

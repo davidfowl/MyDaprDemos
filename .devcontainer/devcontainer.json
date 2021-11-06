@@ -2,7 +2,7 @@
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.202.3/containers/alpine
 {
 	"name": "MyDaprDemos",
-	"image": "darquewarrior/daprdevcontainer:0.0.4",
+	"image": "darquewarrior/daprdevcontainer:latest",
 	"remoteEnv": {
 		"PATH": "${containerEnv:PATH}:/home/vscode/.dapr/bin"
 	},

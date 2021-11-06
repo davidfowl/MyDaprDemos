@@ -34,7 +34,7 @@ aws configure set output table
 pwsh -Command "& {Install-Module -Name Trackyon.Utils, VSTeam, powershell-yaml, PSSodium -Force}"
 
 # Install Tye
-dotnet tool install -g Microsoft.Tye --version "0.10.0-alpha.21420.1"
-dotnet tool install -g Microsoft.Web.LibraryManager.Cli
+# dotnet tool install -g Microsoft.Tye --version "0.10.0-alpha.21420.1"
+# dotnet tool install -g Microsoft.Web.LibraryManager.Cli
  
 echo "on-create complete" >> ~/status
