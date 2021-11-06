@@ -45,9 +45,3 @@ CMD [ "sleep", "infinity" ]
 # [Optional] Uncomment this section to install additional OS packages.
 # RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 #     && apt-get -y install --no-install-recommends <your-package-list-here>
-
-USER vscode
-
-# Install Tye
-RUN dotnet tool install -g Microsoft.Tye --version "0.10.0-alpha.21420.1"
-RUN dotnet tool install -g Microsoft.Web.LibraryManager.Cli
