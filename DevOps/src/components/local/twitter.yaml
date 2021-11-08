@@ -10,15 +10,15 @@ spec:
   metadata:
   - name: consumerKey
     secretKeyRef:
-      name: apiKey
+      name: Twitter:ConsumerKey # twitter api consumer key, required
   - name: consumerSecret
     secretKeyRef:
-      name: apiKeySecret
+      name: Twitter:ConsumerSecret # twitter api consumer secret, required
   - name: accessToken
     secretKeyRef:
-      name: accessToken
+      name: Twitter:AccessToken # twitter api access token, required
   - name: accessSecret
     secretKeyRef:
-      name: accessTokenSecret
+      name: Twitter:AccessSecret # twitter api access secret, required
   - name: query
-    value: "microsoft"
+    value: "Microsoft" # your search query, required
