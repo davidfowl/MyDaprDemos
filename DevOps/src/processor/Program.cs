@@ -15,6 +15,9 @@ var apiURL = $"{ENDPOINT}text/analytics/v2.1/sentiment";
 
 app.MapPost("/score", async (Tweet t) =>
 {
+    if (t == null) throw new ArgumentNullException(nameof(t));
+    //_ = t ?? throw new ArgumentNullException(nameof(t));
+    app.Logger.LogInformation(t.ToString());
     app.Logger.LogInformation($"processing tweet: {t.Author.Name}, {t.Language}, {t.Text}");
 
     // this allows the demo to run locally with no cloud resources provisioned.

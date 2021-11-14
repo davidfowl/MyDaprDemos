@@ -7,16 +7,37 @@ builder.Services.AddHttpClient();
 // Configure and enable middlewares
 var app = builder.Build();
 
-var baseURL = Environment.GetEnvironmentVariable("BASE_URL") ?? "http://localhost" + ":" + Environment.GetEnvironmentVariable("DAPR_HTTP_PORT") ?? "3500"; //reconfigure cpde to make requests to Dapr sidecar
+var baseURL = (Environment.GetEnvironmentVariable("BASE_URL") ?? "http://localhost") + ":" + (Environment.GetEnvironmentVariable("DAPR_HTTP_PORT") ?? "3500"); //reconfigure cpde to make requests to Dapr sidecar
 app.Logger.LogInformation("Init: base URL set: " + baseURL);
 
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
+    //baseURL = "http://localhost:5030";
+    //app.Logger.LogInformation("Init: base URL set: " + baseURL);
 }
+
+//--test POST
+var testTweet = new Tweet("A123", "EN-US", new TwitterUser("paulyuk99", "picture", "Paul Y."), "This is great!", "This is great!");
+//test post Dapr
+app.Logger.LogInformation("--Simulating /tweets service invoked via Dapr...");
+var daprClient = new Dapr.Client.DaprClientBuilder().Build();
+var sTweet = await daprClient.InvokeMethodAsync<Tweet, AnalyzedTweet>("processor", "score", testTweet); //optionally use Dapr SDK for Service Invoke
+app.Logger.LogInformation("--done test.");
+
+//test post httpClient
+app.Logger.LogInformation("--Simulating /tweets service invoked via HTTP...");
+var hClient = HttpClientFactory.Create();
+
+hClient.DefaultRequestHeaders.Add("dapr-app-id", "processor"); //only code needed for Dapr service discovery - add a header to enable HTTP Proxy
+var res = await hClient.PostAsJsonAsync<Tweet>(baseURL + "/score", testTweet);
+AnalyzedTweet aTweet = await res.Content.ReadFromJsonAsync<AnalyzedTweet>();
+app.Logger.LogInformation("--done test.");
+//--done test
 
 app.MapPost("/tweets", async (Tweet t, Dapr.Client.DaprClient daprClient, IHttpClientFactory httpClientFactory) =>
  {
+
      app.Logger.LogInformation("/tweets service invoked...");
      var httpClient = httpClientFactory.CreateClient();
      httpClient.DefaultRequestHeaders.Add("dapr-app-id", "processor"); //only code needed for Dapr service discovery - add a header to enable HTTP Proxy
@@ -26,7 +47,7 @@ app.MapPost("/tweets", async (Tweet t, Dapr.Client.DaprClient daprClient, IHttpC
 
      app.Logger.LogInformation("/tweet scored, saving to state store");
      await daprClient.SaveStateAsync<AnalyzedTweet>("statestore", t.Id, scoredTweet);
-        
+
      app.Logger.LogInformation("/tweet saved, publishing to pubsub");
      await daprClient.PublishEventAsync<AnalyzedTweet>("pubsub", "scored", scoredTweet);
      app.Logger.LogInformation("/tweet processed");
