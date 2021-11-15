@@ -3,7 +3,7 @@ kind: Component
 metadata:
   name: tweets
 auth:
-  secretStore: strongbox  
+  secretStore: twittersecretstore  
 spec:
   type: bindings.twitter
   version: v1
