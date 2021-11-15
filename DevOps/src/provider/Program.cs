@@ -17,7 +17,7 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 }
 
-app.MapPost("/tweets", async (Tweet t, Dapr.Client.DaprClient daprClient, IHttpClientFactory httpClientFactory) =>
+app.MapPost("/tweets", async (Tweet t, IHttpClientFactory httpClientFactory, Dapr.Client.DaprClient daprClient) =>
  {
      app.Logger.LogInformation("/tweets service invoked, invoking processor service for score...");
      var httpClient = httpClientFactory.CreateClient();
@@ -32,7 +32,7 @@ app.MapPost("/tweets", async (Tweet t, Dapr.Client.DaprClient daprClient, IHttpC
      var responseBody = await response.Content.ReadAsStringAsync();
 
      AnalyzedTweet scoredTweet = JsonSerializer.Deserialize<AnalyzedTweet>(responseBody);
-     app.Logger.LogInformation("Scored tweet raw debug: " + scoredTweet.ToString());
+     app.Logger.LogInformation("Scored tweet: " + scoredTweet.ToString());
 
      //Alternately, replace above with Dapr SDK for Invoke
      //scoredTweet = await daprClient.InvokeMethodAsync<Tweet, AnalyzedTweet>("processor", "score", t); //optionally use Dapr SDK for Service Invoke
