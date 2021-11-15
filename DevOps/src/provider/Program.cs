@@ -1,3 +1,5 @@
+using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,37 +15,27 @@ app.Logger.LogInformation("Init: base URL set: " + baseURL);
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
-    //baseURL = "http://localhost:5030";
-    //app.Logger.LogInformation("Init: base URL set: " + baseURL);
 }
-
-//--test POST
-var testTweet = new Tweet("A123", "EN-US", new TwitterUser("paulyuk99", "picture", "Paul Y."), "This is great!", "This is great!");
-//test post Dapr
-app.Logger.LogInformation("--Simulating /tweets service invoked via Dapr...");
-var daprClient = new Dapr.Client.DaprClientBuilder().Build();
-var sTweet = await daprClient.InvokeMethodAsync<Tweet, AnalyzedTweet>("processor", "score", testTweet); //optionally use Dapr SDK for Service Invoke
-app.Logger.LogInformation("--done test.");
-
-//test post httpClient
-app.Logger.LogInformation("--Simulating /tweets service invoked via HTTP...");
-var hClient = HttpClientFactory.Create();
-
-hClient.DefaultRequestHeaders.Add("dapr-app-id", "processor"); //only code needed for Dapr service discovery - add a header to enable HTTP Proxy
-var res = await hClient.PostAsJsonAsync<Tweet>(baseURL + "/score", testTweet);
-AnalyzedTweet aTweet = await res.Content.ReadFromJsonAsync<AnalyzedTweet>();
-app.Logger.LogInformation("--done test.");
-//--done test
 
 app.MapPost("/tweets", async (Tweet t, Dapr.Client.DaprClient daprClient, IHttpClientFactory httpClientFactory) =>
  {
-
-     app.Logger.LogInformation("/tweets service invoked...");
+     app.Logger.LogInformation("/tweets service invoked, invoking processor service for score...");
      var httpClient = httpClientFactory.CreateClient();
-     httpClient.DefaultRequestHeaders.Add("dapr-app-id", "processor"); //only code needed for Dapr service discovery - add a header to enable HTTP Proxy
-     var response = await httpClient.PostAsJsonAsync<Tweet>(baseURL + "/score", t);
-     AnalyzedTweet scoredTweet = await response.Content.ReadFromJsonAsync<AnalyzedTweet>();
-     //var scoredTweet = await daprClient.InvokeMethodAsync<Tweet, AnalyzedTweet>("processor", "score", t); //optionally use Dapr SDK for Service Invoke
+     httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+     httpClient.DefaultRequestHeaders.Add("dapr-app-id", "processor"); //only new code needed for Dapr service discovery - add a header to enable HTTP Proxy
+
+     var tweetJson = JsonSerializer.Serialize<Tweet>(t);
+     var content = new StringContent(tweetJson, Encoding.UTF8, "application/json");
+
+     app.Logger.LogInformation("Posting to: " + baseURL + "/score ; with: " + tweetJson);
+     var response = await httpClient.PostAsync(baseURL + "/score", content);
+     var responseBody = await response.Content.ReadAsStringAsync();
+
+     AnalyzedTweet scoredTweet = JsonSerializer.Deserialize<AnalyzedTweet>(responseBody);
+     app.Logger.LogInformation("Scored tweet raw debug: " + scoredTweet.ToString());
+
+     //Alternately, replace above with Dapr SDK for Invoke
+     //scoredTweet = await daprClient.InvokeMethodAsync<Tweet, AnalyzedTweet>("processor", "score", t); //optionally use Dapr SDK for Service Invoke
 
      app.Logger.LogInformation("/tweet scored, saving to state store");
      await daprClient.SaveStateAsync<AnalyzedTweet>("statestore", t.Id, scoredTweet);
@@ -65,7 +57,7 @@ public record Tweet([property: JsonPropertyName("id_str")] string Id,
                     [property: JsonPropertyName("lang")] string Language,
                     [property: JsonPropertyName("user")] TwitterUser Author,
                     [property: JsonPropertyName("full_text")] string FullText,
-                    string Text);
+                    [property: JsonPropertyName("text")] string Text);
 
-public record AnalyzedTweet(Tweet Tweet,
+public record AnalyzedTweet([property: JsonPropertyName("tweet")] Tweet Tweet,
                             float score);
